@@ -40,11 +40,14 @@ Then /^I should (not )?see the following ratings: (.*)/ do |not_see, rating_list
     end
 end
 
-Then /^I should see (none|all) of the movies$/ do |should|
-    rows = page.all("table#movies tbody tr td[1]").map {|t| t.text}
-    if should == "none"
-        assert rows.size == 0
-    else
-        assert rows.size == Movie.all.count
-    end
+Then /I should( not)? see all of the movies/ do |orNot|
+  Movie.all.each_with_index {
+    |movie, index|
+      name = movie[:title]
+      if(!index) #first element
+        Then %Q{I should#{orNot} see "#{name}"}
+      else
+        And %Q{I should#{orNot} see "#{name}"}
+      end
+  }
 end
